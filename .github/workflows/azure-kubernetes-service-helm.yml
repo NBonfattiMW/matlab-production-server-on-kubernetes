@@ -86,7 +86,9 @@ jobs:
           overrides: |
             global:
               agreeToLicense: "yes"
-              licenseServer: 27000@skoflexlm
+              licenseServer: ${{ secrets.LICENSE_SERVER }}
+              images:
+                registry: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io
           helm-version: "latest"
         id: bake
 
