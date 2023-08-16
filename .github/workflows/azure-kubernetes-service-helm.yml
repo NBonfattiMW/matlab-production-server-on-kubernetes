@@ -42,7 +42,7 @@ env:
   RESOURCE_GROUP: "Nick-Eitan-SKO"
   CLUSTER_NAME: "sko-k8s"
   CHART_PATH: "releases/R2023a/matlab-prodserver"
-  CHART_OVERRIDE_PATH: ""
+  CHART_OVERRIDE_PATH: "values-overrides.yaml"
 
 jobs:
   deploy:
