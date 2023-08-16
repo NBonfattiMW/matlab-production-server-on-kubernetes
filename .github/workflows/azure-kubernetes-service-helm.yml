@@ -32,49 +32,25 @@
 # For more samples to get started with GitHub Action workflows to deploy to Azure, refer to https://github.com/Azure/actions-workflow-samples
 # For more options with the actions used below please refer to https://github.com/Azure/login
 
-name: Build and deploy an app to AKS with Helm
+name: Deploy MATLAB Production Server to AKS with Helm
 
 on:
   workflow_dispatch:
 
 env:
-  AZURE_CONTAINER_REGISTRY: "your-azure-container-registry"
-  CONTAINER_NAME: "your-container-name"
-  RESOURCE_GROUP: "your-resource-group"
-  CLUSTER_NAME: "your-cluster-name"
-  CHART_PATH: "your-chart-path"
-  CHART_OVERRIDE_PATH: "your-chart-override-path"
+  AZURE_CONTAINER_REGISTRY: "skocr"
+  RESOURCE_GROUP: "Nick-Eitan-SKO"
+  CLUSTER_NAME: "sko-k8s"
+  CHART_PATH: "releases/R2023a/matlab-prodserver"
+  CHART_OVERRIDE_PATH: ""
 
 jobs:
-  buildImage:
-    permissions:
-      contents: read
-      id-token: write
-    runs-on: ubuntu-latest
-    steps:
-      # Checks out the repository this file is in
-      - uses: actions/checkout@v3
-
-      # Logs in with your Azure credentials
-      - name: Azure login
-        uses: azure/login@v1.4.6
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      # Builds and pushes an image up to your Azure Container Registry
-      - name: Build and push image to ACR
-        run: |
-          az acr build --image ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.RESOURCE_GROUP }} .
-
   deploy:
     permissions:
       actions: read
       contents: read
       id-token: write
     runs-on: ubuntu-latest
-    needs: [buildImage]
     steps:
       # Checks out the repository this file is in
       - uses: actions/checkout@v3
@@ -110,7 +86,9 @@ jobs:
           helmChart: ${{ env.CHART_PATH }}
           overrideFiles: ${{ env.CHART_OVERRIDE_PATH }}
           overrides: |
-            replicas:2
+            global:
+              agreeToLicense: "yes"
+              licenseServer: 27000@skoflexlm
           helm-version: "latest"
         id: bake
 
@@ -121,4 +99,6 @@ jobs:
           action: deploy
           manifests: ${{ steps.bake.outputs.manifestsBundle }}
           images: |
-            ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ github.sha }}
+            ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/matlab-production-server:r2023a
+            ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/matlab-runtime:r2023a
+
