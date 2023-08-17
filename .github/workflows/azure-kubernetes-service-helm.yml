@@ -38,7 +38,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_CONTAINER_REGISTRY: "skocr"
+  MATLAB_RELEASE: "r2023a"
   RESOURCE_GROUP: "Nick-Eitan-SKO"
   CLUSTER_NAME: "sko-k8s"
   CHART_PATH: "releases/R2023a/matlab-prodserver"
@@ -86,7 +86,6 @@ jobs:
           overrides: |
             global.agreeToLicense:Yes
             global.licenseServer:${{ secrets.LICENSE_SERVER }}
-            global.images.registry:${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io
           helm-version: "latest"
         id: bake
 
@@ -97,6 +96,6 @@ jobs:
           action: deploy
           manifests: ${{ steps.bake.outputs.manifestsBundle }}
           images: |
-            ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/matlab-production-server:r2023a
-            ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/matlab-runtime:r2023a
+            containers.mathworks.com/matlab-production-server:${{ env.MATLAB_RELEASE }}
+            containers.mathworks.com/matlab-runtime:${{ env.MATLAB_RELEASE }}
 
