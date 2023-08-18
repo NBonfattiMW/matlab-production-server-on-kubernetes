@@ -6,9 +6,11 @@ on:
 env:
   RESOURCE_GROUP: "esteiner-cicd"
   LOCATION: "eastus"
-  CLUSTER_NAME: "sko-k8s"
+  CLUSTER_NAME: "esteiner-aks"
   CHART_PATH: "releases/R2023a/matlab-prodserver"
   CHART_OVERRIDE_PATH: "values-overrides.yaml"
+  DNS_PREFIX: "mpstest"
+  LINUX_ADMIN: "azureuser"
 
 jobs:
   deploy-azure-resources:
@@ -26,17 +28,14 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Verify login
+      - name: Create AKS Cluster
         uses: azure/CLI@v1
         with:
           inlineScript: |
             az account show
             az group list
-
-      - name: Create AKS Cluster
-        uses: azure/arm-deploy@v1
-        with:
-          resourceGroupName: ${{ env.RESOURCE_GROUP }}
-          template: azure-deployment/templates/maindeploy.json
-          parameters: azure-deployment/parameters/maindeploy.json
+            az deployment group create --resource-group ${{ env.RESOURCE_GROUP }}    \
+                --template-file azure-deployment/aks.bicep --parameters              \
+                clusterName=${{ env.CLUSTER_NAME }} dnsPrefix=${{ env.DNS_PREFIX }}  \
+                linuxAdminUsername=${{ env.LINUX_ADMIN }} sshRSAPublicKey=${{ secrets.SSH_RSA_PUBLIC_KEY }}
 
