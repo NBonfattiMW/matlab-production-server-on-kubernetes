@@ -12,6 +12,9 @@ env:
 
 jobs:
   deploy-azure-resources:
+    permissions:
+      id-token: write
+
     runs-on: ubuntu-latest
     steps:
       # Checks out the repository this file is in
@@ -30,7 +33,7 @@ jobs:
         with:
           inlineScript: |
             az account show
-            az group create --name ${{ env.RESOURCE_GROUP }} --location ${{ env.LOCATION }}
+            # az group create --name ${{ env.RESOURCE_GROUP }} --location ${{ env.LOCATION }}
             az group list
 
       - name: Create AKS Cluster
