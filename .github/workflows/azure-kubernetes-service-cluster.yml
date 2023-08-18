@@ -1,0 +1,33 @@
+name: Create AKS cluster
+
+on:
+  workflow_dispatch:
+
+env:
+  RESOURCE_GROUP: "mpskubetest"
+  LOCATION: "eastus"
+  CLUSTER_NAME: "sko-k8s"
+  CHART_PATH: "releases/R2023a/matlab-prodserver"
+  CHART_OVERRIDE_PATH: "values-overrides.yaml"
+
+jobs:
+  deploy-azure-resources:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks out the repository this file is in
+      - uses: actions/checkout@v3
+
+      # Logs in with your Azure credentials
+      - name: Azure login
+        uses: azure/login@v1.4.6
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Use kubelogin to c
+      - name: Create AKS Cluster
+        uses: azure/arm-deploy@v1
+        with:
+          resourceGroupName: ${{ env.RESOURCE_GROUP }}
+          template: azure-deployment/templates/maindeploy.json
+          parameters: azure-deployment/parameters/maindeploy.json
+
