@@ -59,6 +59,9 @@ spec:
           mountPath: "/opt/matlabruntime"
         - name: mps-config
           mountPath: "/opt/mpsinstance/config"
+        - name: mps-license
+          mountPath: "/opt/mpsinstance/license.dat"
+          readOnly: true
 
         startupProbe:
           exec:
@@ -115,6 +118,10 @@ spec:
       - name: mps-config
         configMap:
           name: matlab-production-server-config
+      - name: mps-license
+        secret:
+          secretName: license
+          optional: true
       - name: auto-deploy
         {{- if eq .Values.matlabProductionServerSettings.autoDeploy.volumeType "hostpath" }}
         hostPath:
