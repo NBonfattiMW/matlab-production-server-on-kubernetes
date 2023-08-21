@@ -32,10 +32,9 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-            az account show
             az group list
             az deployment group create --resource-group ${{ env.RESOURCE_GROUP }}    \
-                --template-file azure-deployment/aks.bicep --parameters              \
+                --template-file deployments/aks.bicep --parameters                   \
                 clusterName=${{ env.CLUSTER_NAME }} dnsPrefix=${{ env.DNS_PREFIX }}  \
                 linuxAdminUsername=${{ env.LINUX_ADMIN }} sshRSAPublicKey=${{ secrets.SSH_RSA_PUBLIC_KEY }}
 
