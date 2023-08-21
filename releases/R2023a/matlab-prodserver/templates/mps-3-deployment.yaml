@@ -60,7 +60,7 @@ spec:
         - name: mps-config
           mountPath: "/opt/mpsinstance/config"
         - name: mps-license
-          mountPath: "/opt/mpsinstance"
+          mountPath: "/opt/mpsinstance/x509"
           readOnly: true
 
         startupProbe:
