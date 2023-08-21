@@ -57,7 +57,7 @@ jobs:
           overrides: |
             global.agreeToLicense:Yes
             global.licenseServer:${{ secrets.LICENSE_SERVER }}
-            deploymentSettings.cpuRequest:"250m"
+            deploymentSettings.cpuRequest:250m
           helm-version: "latest"
         id: bake
 
