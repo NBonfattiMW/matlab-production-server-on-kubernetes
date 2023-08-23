@@ -47,6 +47,12 @@ jobs:
           admin: 'false'
           use-kubelogin: 'true'
 
+      # Create K8s secret for license data
+      - name: Create license secret
+        run: |
+          kubectl delete secret/license --ignore-not-found
+          kubectl create secret generic license2 --from-literal=license=${{ secret.LICENSE }}
+
       # Runs Helm to create manifest files
       - name: Bake deployment
         uses: azure/k8s-bake@v2
