@@ -23,10 +23,8 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      # Checks out the repository this file is in
       - uses: actions/checkout@v3
 
-      # Logs in with your Azure credentials
       - name: Azure login
         uses: azure/login@v1.4.6
         with:
@@ -47,7 +45,7 @@ jobs:
           admin: 'false'
           use-kubelogin: 'true'
 
-      # Create K8s secret for license data
+      # Create K8s secret for license info
       - name: Create license secret
         run: |
           kubectl delete secret/license --ignore-not-found
@@ -76,4 +74,9 @@ jobs:
           images: |
             ${{ env.CONTAINER_REGISTRY }}/${{ env.MATLAB_RUNTIME }}
             ${{ env.CONTAINER_REGISTRY }}/${{ env.MATLAB_PRODSERVER }}
+
+      - name: Test application
+        run: |
+          kubectl port-forward svc/matlab-production-server 9910:9910 &
+          curl localhost:9910/api/metrics
 
