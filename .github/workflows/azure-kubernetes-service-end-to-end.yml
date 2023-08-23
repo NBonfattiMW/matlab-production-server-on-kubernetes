@@ -1,4 +1,4 @@
-name: MATLAB Production Server AKS End-to-End Test
+name: MATLAB Production Server AKS E2E Test
 
 on:
   workflow_dispatch:
