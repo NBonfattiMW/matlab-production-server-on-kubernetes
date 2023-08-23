@@ -51,7 +51,7 @@ jobs:
       - name: Create license secret
         run: |
           kubectl delete secret/license --ignore-not-found
-          kubectl create secret generic license2 --from-literal=license=${{ secret.LICENSE }}
+          kubectl create secret generic license2 --from-literal=license=${{ secrets.LICENSE }}
 
       # Runs Helm to create manifest files
       - name: Bake deployment
