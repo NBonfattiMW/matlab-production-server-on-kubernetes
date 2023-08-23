@@ -78,5 +78,5 @@ jobs:
       - name: Test application
         run: |
           kubectl port-forward svc/matlab-production-server 9910:9910 &
-          curl --connect-timeout 2 localhost:9910/api/metrics
+          sleep 2 && curl localhost:9910/api/metrics
 
