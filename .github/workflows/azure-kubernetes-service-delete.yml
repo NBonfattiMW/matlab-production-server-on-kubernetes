@@ -8,7 +8,7 @@ env:
   CLUSTER_NAME: "esteiner-aks"
 
 jobs:
-  deploy-azure-resources:
+  delete-azure-resources:
     permissions:
       id-token: write
 
