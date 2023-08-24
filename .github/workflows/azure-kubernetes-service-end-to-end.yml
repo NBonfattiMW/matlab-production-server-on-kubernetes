@@ -2,6 +2,8 @@ name: MATLAB Production Server AKS E2E Test
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 18 * * 4'
 
 env:
   RESOURCE_GROUP: "esteiner-cicd"
