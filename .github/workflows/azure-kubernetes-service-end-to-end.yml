@@ -16,8 +16,8 @@ env:
   CHART_PATH: "releases/R2023b/matlab-prodserver"
   CHART_OVERRIDE_PATH: "values-overrides.yaml"
 
-# CONTAINER_REGISTRY: "containers.mathworks.com"
-# MATLAB_PRODSERVER: "matlab-production-server:r2023b"
+  CONTAINER_REGISTRY: "containers.mathworks.com"
+  MATLAB_PRODSERVER: "matlab-production-server:r2023b"
 # MATLAB_RUNTIME: "matlab-runtime:r2023b"
 
 jobs:
@@ -101,9 +101,8 @@ jobs:
         with:
           action: deploy
           manifests: ${{ steps.bake.outputs.manifestsBundle }}
-#         images: |
-#           ${{ env.CONTAINER_REGISTRY }}/${{ env.MATLAB_RUNTIME }}
-#           ${{ env.CONTAINER_REGISTRY }}/${{ env.MATLAB_PRODSERVER }}
+          images: |
+            ${{ env.CONTAINER_REGISTRY }}/${{ env.MATLAB_PRODSERVER }}
 
       - name: Test application
         run: |
