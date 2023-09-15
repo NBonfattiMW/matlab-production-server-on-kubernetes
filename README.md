@@ -25,7 +25,7 @@ Before starting, you need the following:
 * [Git™](https://git-scm.com/)
 * [Docker®](https://www.docker.com/)
 * Running [Kubernetes](https://kubernetes.io/) cluster that meets the following conditions: 
-    * Uses Kubernetes version 1.24 or later.
+    * Uses Kubernetes version 1.25 or later.
     * Each MATLAB Production Server container in the Kubernetes cluster requires at least 1 CPU core and 2 GiB RAM.
 * [kubectl](https://kubernetes.io/docs/reference/kubectl/overview/) command-line tool that can access your Kubernetes cluster
 * [Helm](https://helm.sh/) package manager to install Helm charts that contain preconfigured Kubernetes resources for MATLAB Production Server
@@ -41,40 +41,37 @@ The MATLAB Production Server on Kubernetes GitHub repository contains Helm chart
     ```
     git clone https://github.com/mathworks-ref-arch/matlab-production-server-on-kubernetes.git
     ```
-2. Navigate to the Helm chart folder for the release you want to use. Replace `<release>` with the release version, for example, `R2023a`.
+    This repository includes Helm chart folders for each supported MATLAB Production Server release and a `values-overrides.yaml` file containing configuration options that apply across all release deployments.
+
+2. Navigate to the Helm chart folder for the release you want to use. Replace `<release>` with the release version, for example, `R2023b`.
     ```
     cd matlab-production-server-on-kubernetes/releases/<release>/matlab-prodserver
     ```
     This folder contains two files that together define the Helm chart used to deploy MATLAB Production Server.
     * `Chart.yaml` &mdash; Contains metadata about the Helm chart.
-    * `values.yaml` &mdash; Contains configuration options for the deployment.
+    * `values.yaml` &mdash; Contains release-specific configuration options for the deployment.
 
 ### Pull Container Images for MATLAB Production Server and MATLAB Runtime
-1. Log in to the MathWorks container registry, `containers.mathworks.com`, using the credentials of your MathWorks account.
 
-    ```
-    docker login containers.mathworks.com
-    ```
-
-2. Pull the container image for MATLAB Production Server to your machine.
+1. Pull the container image for MATLAB Production Server to your machine.
 
     ```
     docker pull containers.mathworks.com/matlab-production-server:<release-tag>
     ```
     * `containers.mathworks.com` is the name of the container registry.
     * `matlab-production-server` is the name of the repository.
-    * `<release-tag>` is the tag name of the MATLAB Production Server release, for example, `r2023a`.
+    * `<release-tag>` is the tag name of the MATLAB Production Server release, for example, `r2023b`.
 
     The `values.yaml` file specifies these values in the `productionServer` section, in the `registry`, `repository`, and `tag` variables, respectively. 
 
-3. Pull the container image for MATLAB Runtime to your machine.
+2. Pull the container image for MATLAB Runtime to your machine.
 
     ```
     docker pull containers.mathworks.com/matlab-runtime:<release-tag>
     ```
     * `containers.mathworks.com` is the name of the container registry.
     * `matlab-runtime` is the name of the repository.
-    * `<release-tag>` is the tag name of the MATLAB Runtime release. Update this value to the release version of the MATLAB Runtime you are using, for example, `r2023a`. MATLAB Production Server supports MATLAB Runtime versions up to six releases back from the MATLAB Production Server version you are using.
+    * `<release-tag>` is the tag name of the MATLAB Runtime release. Update this value to the release version of the MATLAB Runtime you are using, for example, `r2023b`. MATLAB Production Server supports MATLAB Runtime versions up to six releases back from the MATLAB Production Server version you are using.
 
     The `values.yaml` file specifies these values in the `matlabRuntime` section, in the `registry`, `repository`, and `tag` variables, respectively.  
 
@@ -85,14 +82,16 @@ After you pull the MATLAB Production Server and MATLAB Runtime container images 
 
 2. Push the images to your private registry by using [docker push](https://docs.docker.com/engine/reference/commandline/push/).
 
-3. In the `values.yaml` file, set the `productionServer` > `registry` and `matlabRuntime` > `registry` variables to the name of your private registry.
+3. In the `values-overrides.yaml` file, set the `global` > `images` > `registry` variable to the name of your private registry.
 
 4. If your private registry requires authentication, create a Kubernetes Secret that your pod can use to pull the image from the private registry. For more information, see [Pull an Image from a Private Registry](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/) in the Kubernetes documentation. 
+
+5. In the `values-overrides.yaml` file, set the `global` > `images` > `pullSecret` variable to the name of the Kubernetes Secret you created.
 
 ### Provide Mapping for Deployable Archives
 Deploying MATLAB Production Server requires a running Kubernetes cluster. From the Kubernetes cluster that you use for MATLAB Production Server, provide a mapping from the storage location where you want to store MATLAB Production Server deployable archives (CTF files) to a storage resource in your cluster. You can store the deployable archives on the network file system or on the cloud. After the MATLAB Production Server deployment is complete, the deployable archives that you store in the mapped location are automatically deployed to the server.
 
-To specify mapping, in the `values.yaml` file, under `matlabProductionServerSettings`, set values for the variables under `autoDeploy`.
+To specify mapping, in the top-level `values-overrides.yaml` file, under `matlabProductionServerSettings`, set values for the variables under `autoDeploy`.
 
 To specify the storage location for storing deployable archives, under `autoDeploy`, set `volumeType` to one of the following:
 
@@ -105,15 +104,15 @@ The default value for `volumeType` is `"empty"`. However, to access deployable a
 ### Install Helm Chart
 The Helm chart for MATLAB Production Server is located in the repository in `/releases/<release>/matlab-prodserver`. To install the Helm chart for the MATLAB Production Server release that you want to deploy, use the [helm install](https://helm.sh/docs/helm/helm_install/) command. Install the chart in a separate Kubernetes namespace. For more information about Kubernetes namespaces, see [Share a Cluster with Namespaces](https://kubernetes.io/docs/tasks/administer-cluster/namespaces/) in the Kubernetes documentation.
 
-To install the chart, you must set parameters that state your agreement to the MathWorks cloud reference architecture license and specify the address of the network license manager. You can set the parameters either in the `values.yaml` file in the chart or when running `helm install`.
+Before installing the chart, first set parameters that state your agreement to the MathWorks cloud reference architecture license and specify the address of the network license manager. In the top-level `values-overrides.yaml` file, set these parameters:
 
-- To accept the license terms, set the `global.agreeToLicense` parameter to `Yes`.  
-- To specify the address of the license server, set the `global.licenseServer` parameter in the format `port_number@host`. 
+- To accept the license terms, set `global` > `agreeToLicense` to `"yes"`.
+- To specify the address of the license server, set `global` > `licenseServer` using the format `port_number@host`. 
 
-For example, this `helm install` command installs the Helm chart for MATLAB Production Server:
+Then, install the Helm chart for MATLAB Production Server by using the `helm install` command:
 
 ```
-helm install [-n <k8s-namespace>] --generate-name <path/to/chart> --set global.agreeToLicense=Yes --set global.licenseServer=<port_number@host>
+helm install -f <path/to/values-overrides.yaml> [-n <k8s-namespace>] --generate-name <path/to/chart>
 ```
 
 After you install the chart, the pod takes a few minutes to initialize because the installation consists of approximately 10 GB of container images.
@@ -125,7 +124,7 @@ After the deployment is complete, upload the MATLAB Production Server deployable
 
 
 ### Manage External Access Using Ingress
-You can manage access to MATLAB Production Server by specifying an [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) controller. The Ingress controller also acts as a load balancer and is the preferred way to expose MATLAB Production Server services in production. This reference architecture assumes that you have an existing Ingress controller already running on the Kubernetes cluster. Specify controller options in the `ingressController` variable of the `values.yaml` file or use the default values.
+You can manage access to MATLAB Production Server by specifying an [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) controller. The Ingress controller also acts as a load balancer and is the preferred way to expose MATLAB Production Server services in production. This reference architecture assumes that you have an existing Ingress controller already running on the Kubernetes cluster. Specify controller options in the `ingressController` variable of the `values-overrides.yaml` file or use the default values.
 
 ### Test Client Access Using Port Forwarding
 To test that the deployment was successful, first, use *port forwarding* to map the port that is running MATLAB Production Server inside the cluster (default = 9910) to a port that is available outside the cluster.

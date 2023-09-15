@@ -1,0 +1,34 @@
+name: Create AKS cluster
+
+on:
+  workflow_dispatch:
+
+env:
+  RESOURCE_GROUP: "esteiner-cicd"
+  CLUSTER_NAME: "esteiner-aks"
+  DNS_PREFIX: "mpstest"
+  LINUX_ADMIN: "azureuser"
+
+jobs:
+  deploy-azure-resources:
+    permissions:
+      id-token: write
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Azure login
+        uses: azure/login@v1.4.6
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Create AKS Cluster
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az group list
+            az deployment group create --resource-group ${{ env.RESOURCE_GROUP }}    \
+                --template-file deployments/aks.bicep --parameters                   \
+                clusterName=${{ env.CLUSTER_NAME }} dnsPrefix=${{ env.DNS_PREFIX }}  \
+                linuxAdminUsername=${{ env.LINUX_ADMIN }} sshRSAPublicKey=${{ secrets.SSH_RSA_PUBLIC_KEY }}

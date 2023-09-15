@@ -46,16 +46,16 @@ images:
   productionServer:
     registry: containers.mathworks.com
     repository: matlab-production-server
-    tag: r2023a
-    variant: R2023a
+    tag: r2023b
+    variant: R2023b
     pullPolicy: IfNotPresent
     pullSecret: ""
 
   matlabRuntime:
     registry: containers.mathworks.com
     repository: matlab-runtime
-    tag: r2023a
-    variant: R2023a
+    tag: r2023b
+    variant: R2023b
     pullPolicy: IfNotPresent
     pullSecret: ""
 
@@ -71,7 +71,9 @@ optionalSettings:
     host: ""
     auth: ""
     name: myRedis
-  # port: 6379
+    port: 6379
+    secretName: ""
+    secretKey: ""
 
   Prometheus:
     # Create a ServiceMonitor [monitoring.coreos.com/v1] for metrics discovery.

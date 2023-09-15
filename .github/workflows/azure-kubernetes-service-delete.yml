@@ -1,0 +1,28 @@
+name: Delete AKS cluster
+
+on:
+  workflow_dispatch:
+
+env:
+  RESOURCE_GROUP: "esteiner-cicd"
+  CLUSTER_NAME: "esteiner-aks"
+
+jobs:
+  delete-azure-resources:
+    permissions:
+      id-token: write
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure login
+        uses: azure/login@v1.4.6
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Delete AKS Cluster
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az group list
+            az aks delete --resource-group ${{ env.RESOURCE_GROUP }}  \
+                --name ${{ env.CLUSTER_NAME }} --yes --no-wait
