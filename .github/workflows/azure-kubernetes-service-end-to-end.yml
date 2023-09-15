@@ -17,8 +17,8 @@ env:
   CHART_OVERRIDE_PATH: "values-overrides.yaml"
 
   CONTAINER_REGISTRY: "containers.mathworks.com"
-  MATLAB_PRODSERVER: "matlab-production-server:r2023b"
-# MATLAB_RUNTIME: "matlab-runtime:r2023b"
+  MATLAB_PRODSERVER: "matlab-production-server:latest"
+# MATLAB_RUNTIME: "matlab-runtime:latest"
 
 jobs:
   deploy-azure-resources:
