@@ -13,12 +13,12 @@ env:
   DNS_PREFIX: "mpstest"
   LINUX_ADMIN: "azureuser"
 
-  CHART_PATH: "releases/R2023a/matlab-prodserver"
+  CHART_PATH: "releases/R2023b/matlab-prodserver"
   CHART_OVERRIDE_PATH: "values-overrides.yaml"
 
   CONTAINER_REGISTRY: "containers.mathworks.com"
-  MATLAB_PRODSERVER: "matlab-production-server:r2023a"
-  MATLAB_RUNTIME: "matlab-runtime:r2023a"
+  MATLAB_PRODSERVER: "matlab-production-server:r2023b"
+  MATLAB_RUNTIME: "matlab-runtime:r2023b"
 
 jobs:
   deploy-azure-resources:
