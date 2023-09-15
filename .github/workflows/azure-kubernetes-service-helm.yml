@@ -10,9 +10,9 @@ env:
   CHART_PATH: "releases/R2023b/matlab-prodserver"
   CHART_OVERRIDE_PATH: "values-overrides.yaml"
 
-  CONTAINER_REGISTRY: "containers.mathworks.com"
-  MATLAB_PRODSERVER: "matlab-production-server:r2023b"
-  MATLAB_RUNTIME: "matlab-runtime:r2023b"
+#  CONTAINER_REGISTRY: "containers.mathworks.com"
+#  MATLAB_PRODSERVER: "matlab-production-server:r2023b"
+#  MATLAB_RUNTIME: "matlab-runtime:r2023b"
 
 jobs:
   deploy:
@@ -71,12 +71,13 @@ jobs:
         with:
           action: deploy
           manifests: ${{ steps.bake.outputs.manifestsBundle }}
-          images: |
-            ${{ env.CONTAINER_REGISTRY }}/${{ env.MATLAB_RUNTIME }}
-            ${{ env.CONTAINER_REGISTRY }}/${{ env.MATLAB_PRODSERVER }}
+#          images: |
+#            ${{ env.CONTAINER_REGISTRY }}/${{ env.MATLAB_RUNTIME }}
+#            ${{ env.CONTAINER_REGISTRY }}/${{ env.MATLAB_PRODSERVER }}
 
       - name: Test application
         run: |
+          kubectl wait pods -l app=mps --for condition=Ready --timeout=180s && kubectl get pods -l app=mps
           kubectl port-forward svc/matlab-production-server 9910:9910 &
           sleep 2 && curl localhost:9910/api/metrics
 
