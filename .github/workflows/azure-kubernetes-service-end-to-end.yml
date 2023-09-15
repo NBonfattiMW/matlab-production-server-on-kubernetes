@@ -102,11 +102,12 @@ jobs:
           action: deploy
           manifests: ${{ steps.bake.outputs.manifestsBundle }}
           images: |
-            ${{ env.CONTAINER_REGISTRY }}/${{ env.MATLAB_RUNTIME }}
+          # ${{ env.CONTAINER_REGISTRY }}/${{ env.MATLAB_RUNTIME }}
             ${{ env.CONTAINER_REGISTRY }}/${{ env.MATLAB_PRODSERVER }}
 
       - name: Test application
         run: |
+          kubectl wait pods -l app=mps --for condition=Ready --timeout=180s && kubectl get pods -l app=mps
           kubectl port-forward svc/matlab-production-server 9910:9910 &
           sleep 2 && curl localhost:9910/api/metrics
 
