@@ -21,7 +21,7 @@ jobs:
         run: helm package releases/R2024a/matlab-prodserver --version 1.0.2 --app-version "R2024a"
 
       - name: Login to GitHub Container Registry
-        run: echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io/esteinerMW --username esteinerMW --password-stdin
+        run: echo ${{ secrets.CR_TOKEN }} | helm registry login ghcr.io/esteinerMW --username esteinerMW --password-stdin
 
       - name: Deploy the chart
         run: helm push matlab-prodserver-k8s-1.0.2.tgz oci://ghcr.io/esteinerMW
