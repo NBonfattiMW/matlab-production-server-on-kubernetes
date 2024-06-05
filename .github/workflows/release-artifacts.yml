@@ -1,0 +1,28 @@
+name: Release Helm Artifacts
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release-helm-chart:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Package the chart
+        run: helm package releases/R2024a/matlab-prodserver --version 1.0.2 --app-version "R2024a"
+
+      - name: Login to GitHub Container Registry
+        run: echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io/esteinerMW --username esteinerMW --password-stdin
+
+      - name: Deploy the chart
+        run: helm push matlab-prodserver-k8s-1.0.2.tgz oci://ghcr.io/esteinerMW
+
